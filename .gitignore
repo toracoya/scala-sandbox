@@ -1,6 +1,10 @@
 # SBT
 target/
 
+# IntelliJ
+
+.idea/
+
 # Emacs
 *#
 *~
