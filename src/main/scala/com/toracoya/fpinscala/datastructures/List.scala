@@ -101,4 +101,87 @@ object List {
     foldRight(list, (b: B) => b)((a, g) => b => g(f(a, b)))(z)
   }
 
+  def appendViaFoldRight[A](list1: List[A], list2: List[A]): List[A] = {
+    foldRight(list1, list2)(Cons(_, _))
+  }
+
+  def concat[A](lists: List[List[A]]): List[A] = {
+    foldRight(lists, Nil:List[A])(append)
+  }
+
+  def add1(list: List[Int]): List[Int] = {
+    foldRight(list, Nil:List[Int])((e, acc) => Cons(e + 1, acc))
+  }
+
+  def doubleToString(list: List[Double]): List[String] = {
+    foldRight(list, Nil:List[String])((e, acc) => Cons(e.toString, acc))
+  }
+
+  def map[A, B](list: List[A])(f: A => B): List[B] = {
+    foldRight(list, Nil:List[B])((e, acc) => Cons(f(e), acc))
+  }
+
+  def filter[A](list: List[A])(p: A => Boolean): List[A] = {
+    foldRight(list, Nil:List[A])((e, acc) => {
+      if (p(e)) {
+        Cons(e, acc)
+      } else {
+        acc
+      }
+    })
+  }
+
+  def flatMap[A, B](list: List[A])(f: A => List[B]): List[B] = {
+    concat(map(list)(f))
+  }
+
+  def filterViaFlatMap[A](list: List[A])(p: A => Boolean): List[A] = {
+    flatMap(list)(e => {
+      if (p(e)) {
+        List(e)
+      } else {
+        Nil
+      }
+    })
+  }
+
+  def zipInt(list1: List[Int], list2: List[Int]): List[Int] = {
+    (list1, list2) match {
+      case (Nil, _) =>
+        Nil
+      case (_, Nil) =>
+        Nil
+      case (Cons(h1, t1), Cons(h2, t2)) =>
+        Cons(h1 + h2, zipInt(t1, t2))
+    }
+  }
+
+  def zipWith[A, B, C](list1: List[A], list2: List[B])(f: (A, B) => C): List[C] = {
+    (list1, list2) match {
+      case (Nil, _) =>
+        Nil
+      case (_, Nil) =>
+        Nil
+      case (Cons(h1, t1), Cons(h2, t2)) =>
+        Cons(f(h1, h2), zipWith(t1, t2)(f))
+    }
+  }
+
+  @tailrec
+  def startsWith[A](list1: List[A], list2: List[A]): Boolean = (list1, list2) match {
+    case (_, Nil) => true
+    case (Cons(h1, t1), Cons(h2, t2)) =>
+      h1 == h2 && startsWith(t1, t2)
+    case _ => false
+  }
+
+  @tailrec
+  def hasSubsequence[A](list1: List[A], list2: List[A]): Boolean = list1 match {
+    case Nil =>
+      list2 == Nil
+    case _ if startsWith(list1, list2) => true
+    case Cons(_, tail) =>
+      hasSubsequence(tail, list2)
+
+  }
 }
